@@ -81,8 +81,8 @@ systemctl enable -q --now pve-ha-lrm
 systemctl enable -q --now pve-ha-crm
 systemctl enable -q --now corosync
 
-apt update &>/dev/null || msg_error "apt update failed"
-apt -y dist-upgrade &>/dev/null || msg_error "apt dist-upgrade failed"
+apt update &>/dev/null || true
+apt -y dist-upgrade &>/dev/null || true
 
+rm -v /var/lib/proxmox-first-boot/pending-first-boot-setup
 reboot
-main
