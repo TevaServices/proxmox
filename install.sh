@@ -83,6 +83,9 @@ systemctl enable -q --now corosync
 
 # Custom section
 
+sysctl fs.inotify.max_user_watches=524288
+sysctl fs.inotify.max_user_instances=512
+
 IFACE="$(ip -o route show default 2>/dev/null | awk "{print \$5; exit}")"
 if [ -z "${IFACE:-}" ]; then
   IFACE="$(ls -1 /sys/class/net | grep -vE "^(lo|vmbr|tap|veth)$" | head -n1)"
