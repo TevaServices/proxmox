@@ -81,6 +81,34 @@ systemctl enable -q --now pve-ha-lrm
 systemctl enable -q --now pve-ha-crm
 systemctl enable -q --now corosync
 
+# Custom section
+
+IFACE="$(ip -o route show default 2>/dev/null | awk "{print \$5; exit}")"
+if [ -z "${IFACE:-}" ]; then
+  IFACE="$(ls -1 /sys/class/net | grep -vE "^(lo|vmbr|tap|veth)$" | head -n1)"
+fi
+
+MAC="$(cat "/sys/class/net/${IFACE}/address" | tr "[:upper:]" "[:lower:]")"
+
+HOST="$(echo "$MAC" | awk -F: "{printf \"%s%s%s\", \$4,\$5,\$6}")"
+
+DOMAIN="pve.local"
+
+FQDN="pve-${HOST}.${DOMAIN}"
+
+hostnamectl set-hostname "${FQDN}"
+
+IPV4="$(ip -4 -o addr show dev "${IFACE}" | awk "{print \$4}" | cut -d/ -f1 || true)"
+
+if [ -n "${IPV4:-}" ]; then
+  sed -i "/^${IPV4//./\\.}\\s/d" /etc/hosts || true
+  sed -i "/^127\\.0\\.1\\.1\\s/d" /etc/hosts || true
+  printf "%s %s %s\n" "${IPV4}" "${FQDN}" "${HOST}" >> /etc/hosts
+else
+  sed -i "/^127\\.0\\.1\\.1\\s/d" /etc/hosts || true
+  printf "127.0.1.1 %s %s\n" "${FQDN}" "${HOST}" >> /etc/hosts
+fi
+
 VG="pve"
 LV="lvol0"
 MNT="/mnt/data"
