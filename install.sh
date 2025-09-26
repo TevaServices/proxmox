@@ -81,6 +81,17 @@ systemctl enable -q --now pve-ha-lrm
 systemctl enable -q --now pve-ha-crm
 systemctl enable -q --now corosync
 
+VG="pve"
+LV="lvol0"
+MNT="/mnt/data"
+
+lvcreate -l +100%FREE -n "$LV" "$VG"
+mkdir -p "$MNT"
+mkfs.xfs -f "/dev/$VG/$LV"
+UUID=$(blkid -s UUID -o value "/dev/$VG/$LV")
+echo "UUID=$UUID  $MNT  xfs  defaults  0  0" >> /etc/fstab
+mount -a
+
 apt update &>/dev/null || true
 apt -y dist-upgrade &>/dev/null || true
 
