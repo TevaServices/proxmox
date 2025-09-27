@@ -83,8 +83,8 @@ systemctl enable -q --now corosync
 
 # Custom section
 
-sysctl fs.inotify.max_user_watches=524288
-sysctl fs.inotify.max_user_instances=512
+# sysctl fs.inotify.max_user_watches=524288
+# sysctl fs.inotify.max_user_instances=512
 
 IFACE="$(ip -o route show default 2>/dev/null | awk "{print \$5; exit}")"
 if [ -z "${IFACE:-}" ]; then
@@ -112,16 +112,16 @@ else
   printf "127.0.1.1 %s %s\n" "${FQDN}" "${HOST}" >> /etc/hosts
 fi
 
-VG="pve"
-LV="lvol0"
-MNT="/mnt/data"
+# VG="pve"
+# LV="lvol0"
+# MNT="/mnt/data"
 
-lvcreate -l +100%FREE -n "$LV" "$VG"
-mkdir -p "$MNT"
-mkfs.xfs -f "/dev/$VG/$LV"
-UUID=$(blkid -s UUID -o value "/dev/$VG/$LV")
-echo "UUID=$UUID  $MNT  xfs  defaults  0  0" >> /etc/fstab
-mount -a
+# lvcreate -l +100%FREE -n "$LV" "$VG"
+# mkdir -p "$MNT"
+# mkfs.xfs -f "/dev/$VG/$LV"
+# UUID=$(blkid -s UUID -o value "/dev/$VG/$LV")
+# echo "UUID=$UUID  $MNT  xfs  defaults  0  0" >> /etc/fstab
+# mount -a
 
 apt update &>/dev/null || true
 apt -y dist-upgrade &>/dev/null || true
